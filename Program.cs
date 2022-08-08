@@ -1,10 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Security;
+using System.Threading.Tasks;
+using Microsoft.Identity.Client;
+using Microsoft.Graph;
+using Microsoft.Extensions.Configuration;
+using Helpers;
 
-namespace graphconsoleapp4
+namespace graphconsoleapp
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("Hello World!");
         }
