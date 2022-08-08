@@ -75,7 +75,7 @@ namespace graphconsoleapp
             Console.WriteLine("Hello " + profileResponse.DisplayName);
 
             // request 1 - all groups
-            Console.WriteLine("\n\nREQUEST 1 - ALL GROUPS:");
+/*             Console.WriteLine("\n\nREQUEST 1 - ALL GROUPS:");
             var requestAllGroups = client.Groups.Request();
             var resultsAllGroups = requestAllGroups.GetAsync().Result;
             foreach (var group in resultsAllGroups)
@@ -84,9 +84,19 @@ namespace graphconsoleapp
             }
 
             Console.WriteLine("\nGraph Request:");
-            Console.WriteLine(requestAllGroups.GetHttpRequestMessage().RequestUri);
+            Console.WriteLine(requestAllGroups.GetHttpRequestMessage().RequestUri); */
 
 
+
+            var groupId = "5fd37035-bb3f-4264-b0b5-c9cb3707f7c5";
+            // request 2 - one group
+            Console.WriteLine("\n\nREQUEST 2 - ONE GROUP:");
+            var requestGroup = client.Groups[groupId].Request();
+            var resultsGroup = requestGroup.GetAsync().Result;
+            Console.WriteLine(resultsGroup.Id + ": " + resultsGroup.DisplayName + " <" + resultsGroup.Mail + ">");
+
+            Console.WriteLine("\nGraph Request:");
+            Console.WriteLine(requestGroup.GetHttpRequestMessage().RequestUri);
         }
 
     }
