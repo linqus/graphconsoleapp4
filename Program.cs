@@ -60,6 +60,57 @@ namespace graphconsoleapp
             return graphClient;
         }
 
+        private static async Task<Microsoft.Graph.Group> CreateGroupAsync(GraphServiceClient client)
+        {
+            // create object to define members & owners as 'additionalData'
+            var additionalData = new Dictionary<string, object>();
+            additionalData.Add("owners@odata.bind",
+              new string[] {
+                "https://graph.microsoft.com/v1.0/users/ea95a616-5ac1-434f-a82c-9e83d2ddce5d"
+              }
+            );
+            additionalData.Add("members@odata.bind",
+              new string[] {
+                "https://graph.microsoft.com/v1.0/users/3ee147fe-23b2-4d25-8094-fc787e331312",
+                "https://graph.microsoft.com/v1.0/users/ea95a616-5ac1-434f-a82c-9e83d2ddce5d"
+              }
+            );
+            var group = new Microsoft.Graph.Group
+            {
+                AdditionalData = additionalData,
+                Description = "My first group created with the Microsoft Graph .NET SDK",
+                DisplayName = "My First Group",
+                GroupTypes = new List<String>() { "Unified" },
+                MailEnabled = true,
+                MailNickname = "myfirstgroup01",
+                SecurityEnabled = false
+            };
+            var requestNewGroup = client.Groups.Request();
+            return await requestNewGroup.AddAsync(group);
+        }
+
+        private static async Task<Microsoft.Graph.Team> TeamifyGroupAsync(GraphServiceClient client, string groupId)
+        {
+            var team = new Microsoft.Graph.Team
+            {
+                MemberSettings = new TeamMemberSettings
+                {
+                    AllowCreateUpdateChannels = true,
+                    ODataType = null
+                },
+                MessagingSettings = new TeamMessagingSettings
+                {
+                    AllowUserEditMessages = true,
+                    AllowUserDeleteMessages = true,
+                    ODataType = null
+                },
+                ODataType = null
+            };
+
+            var requestTeamifiedGroup = client.Groups[groupId].Team.Request();
+            return await requestTeamifiedGroup.PutAsync(team);
+        }
+
 
         public static void Main(string[] args)
         {
@@ -71,52 +122,26 @@ namespace graphconsoleapp
                 return;
             }
             var client = GetAuthenticatedGraphClient(config);
-            // request 1 - all groups member of
-/*             Console.WriteLine("\n\nREQUEST 1 - ALL GROUPS MEMBER OF:");
-            var requestGroupsMemberOf = client.Me.MemberOf.Request();
-            var resultsGroupsMemberOf = requestGroupsMemberOf.GetAsync().Result;
-            foreach (var groupDirectoryObject in resultsGroupsMemberOf)
-            {
-                var group = groupDirectoryObject as Microsoft.Graph.Group;
-                var role = groupDirectoryObject as Microsoft.Graph.DirectoryRole;
-                if (group != null)
-                {
-                    Console.WriteLine("Group: " + group.Id + ": " + group.DisplayName);
-                }
-                else if (role != null)
-                {
-                    Console.WriteLine("Role: " + role.Id + ": " + role.DisplayName);
-                }
-                else
-                {
-                    Console.WriteLine(groupDirectoryObject.ODataType + ": " + groupDirectoryObject.Id);
-                }
-            } */
 
-            // request 2 - all groups owner of
-            Console.WriteLine("\n\nREQUEST 2 - ALL GROUPS OWNER OF:");
-            var requestOwnerOf = client.Me.OwnedObjects.Request();
-            var resultsOwnerOf = requestOwnerOf.GetAsync().Result;
-            foreach (var ownedObject in resultsOwnerOf)
-            {
-                var group = ownedObject as Microsoft.Graph.Group;
-                var role = ownedObject as Microsoft.Graph.DirectoryRole;
-                if (group != null)
-                {
-                    Console.WriteLine("Office 365 Group: " + group.Id + ": " + group.DisplayName);
-                }
-                else if (role != null)
-                {
-                    Console.WriteLine("  Security Group: " + role.Id + ": " + role.DisplayName);
-                }
-                else
-                {
-                    Console.WriteLine(ownedObject.ODataType + ": " + ownedObject.Id);
-                }
-            }
 
-            Console.WriteLine("\nGraph Request:");
-            Console.WriteLine(requestOwnerOf.GetHttpRequestMessage().RequestUri);
+            // request 1 - create new group
+            /*             Console.WriteLine("\n\nREQUEST 1 - CREATE A GROUP:");
+                        var requestNewGroup = CreateGroupAsync(client);
+                        requestNewGroup.Wait();
+                        Console.WriteLine("New group ID: " + requestNewGroup.Id); */
+
+
+            // request 2 - teamify group
+            // get new group ID
+            var requestGroup = client.Groups.Request()
+                                            .Select("Id")
+                                            .Filter("MailNickname eq 'myfirstgroup01'");
+            var resultGroup = requestGroup.GetAsync().Result;
+
+            // teamify group
+            var teamifiedGroup = TeamifyGroupAsync(client, resultGroup[0].Id);
+            teamifiedGroup.Wait();
+            Console.WriteLine(teamifiedGroup.Result.Id);
 
         }
 
