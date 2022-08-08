@@ -111,6 +111,10 @@ namespace graphconsoleapp
             return await requestTeamifiedGroup.PutAsync(team);
         }
 
+        private static async Task DeleteTeamAsync(GraphServiceClient client, string groupIdToDelete)
+        {
+            await client.Groups[groupIdToDelete].Request().DeleteAsync();
+        }
 
         public static void Main(string[] args)
         {
@@ -139,9 +143,13 @@ namespace graphconsoleapp
             var resultGroup = requestGroup.GetAsync().Result;
 
             // teamify group
-            var teamifiedGroup = TeamifyGroupAsync(client, resultGroup[0].Id);
-            teamifiedGroup.Wait();
-            Console.WriteLine(teamifiedGroup.Result.Id);
+            /*             var teamifiedGroup = TeamifyGroupAsync(client, resultGroup[0].Id);
+                        teamifiedGroup.Wait();
+                        Console.WriteLine(teamifiedGroup.Result.Id); */
+
+            // request 3: delete group
+            var deleteTask = DeleteTeamAsync(client, resultGroup[0].Id);
+            deleteTask.Wait();
 
         }
 
