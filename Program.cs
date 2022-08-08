@@ -75,28 +75,47 @@ namespace graphconsoleapp
             Console.WriteLine("Hello " + profileResponse.DisplayName);
 
             // request 1 - all groups
-/*             Console.WriteLine("\n\nREQUEST 1 - ALL GROUPS:");
-            var requestAllGroups = client.Groups.Request();
-            var resultsAllGroups = requestAllGroups.GetAsync().Result;
-            foreach (var group in resultsAllGroups)
-            {
-                Console.WriteLine(group.Id + ": " + group.DisplayName + " <" + group.Mail + ">");
-            }
+            /*             Console.WriteLine("\n\nREQUEST 1 - ALL GROUPS:");
+                        var requestAllGroups = client.Groups.Request();
+                        var resultsAllGroups = requestAllGroups.GetAsync().Result;
+                        foreach (var group in resultsAllGroups)
+                        {
+                            Console.WriteLine(group.Id + ": " + group.DisplayName + " <" + group.Mail + ">");
+                        }
 
-            Console.WriteLine("\nGraph Request:");
-            Console.WriteLine(requestAllGroups.GetHttpRequestMessage().RequestUri); */
+                        Console.WriteLine("\nGraph Request:");
+                        Console.WriteLine(requestAllGroups.GetHttpRequestMessage().RequestUri); */
 
 
 
             var groupId = "5fd37035-bb3f-4264-b0b5-c9cb3707f7c5";
             // request 2 - one group
-            Console.WriteLine("\n\nREQUEST 2 - ONE GROUP:");
+/*             Console.WriteLine("\n\nREQUEST 2 - ONE GROUP:");
             var requestGroup = client.Groups[groupId].Request();
             var resultsGroup = requestGroup.GetAsync().Result;
             Console.WriteLine(resultsGroup.Id + ": " + resultsGroup.DisplayName + " <" + resultsGroup.Mail + ">");
 
             Console.WriteLine("\nGraph Request:");
-            Console.WriteLine(requestGroup.GetHttpRequestMessage().RequestUri);
+            Console.WriteLine(requestGroup.GetHttpRequestMessage().RequestUri); */
+
+            // request 4 - group members
+            Console.WriteLine("\n\nREQUEST 4 - GROUP MEMBERS:");
+            var requestGroupMembers = client.Groups[groupId].Members.Request();
+            var resultsGroupMembers = requestGroupMembers.GetAsync().Result;
+            foreach (var member in resultsGroupMembers)
+            {
+                var memberUser = member as Microsoft.Graph.User;
+                if (memberUser != null)
+                {
+                    Console.WriteLine(memberUser.Id + ": " + memberUser.DisplayName + " <" + memberUser.Mail + ">");
+                }
+            }
+
+            Console.WriteLine("\nGraph Request:");
+            Console.WriteLine(requestGroupMembers.GetHttpRequestMessage().RequestUri);
+
+
+
         }
 
     }
