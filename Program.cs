@@ -72,7 +72,7 @@ namespace graphconsoleapp
             }
             var client = GetAuthenticatedGraphClient(config);
             // request 1 - all groups member of
-            Console.WriteLine("\n\nREQUEST 1 - ALL GROUPS MEMBER OF:");
+/*             Console.WriteLine("\n\nREQUEST 1 - ALL GROUPS MEMBER OF:");
             var requestGroupsMemberOf = client.Me.MemberOf.Request();
             var resultsGroupsMemberOf = requestGroupsMemberOf.GetAsync().Result;
             foreach (var groupDirectoryObject in resultsGroupsMemberOf)
@@ -91,8 +91,32 @@ namespace graphconsoleapp
                 {
                     Console.WriteLine(groupDirectoryObject.ODataType + ": " + groupDirectoryObject.Id);
                 }
+            } */
+
+            // request 2 - all groups owner of
+            Console.WriteLine("\n\nREQUEST 2 - ALL GROUPS OWNER OF:");
+            var requestOwnerOf = client.Me.OwnedObjects.Request();
+            var resultsOwnerOf = requestOwnerOf.GetAsync().Result;
+            foreach (var ownedObject in resultsOwnerOf)
+            {
+                var group = ownedObject as Microsoft.Graph.Group;
+                var role = ownedObject as Microsoft.Graph.DirectoryRole;
+                if (group != null)
+                {
+                    Console.WriteLine("Office 365 Group: " + group.Id + ": " + group.DisplayName);
+                }
+                else if (role != null)
+                {
+                    Console.WriteLine("  Security Group: " + role.Id + ": " + role.DisplayName);
+                }
+                else
+                {
+                    Console.WriteLine(ownedObject.ODataType + ": " + ownedObject.Id);
+                }
             }
 
+            Console.WriteLine("\nGraph Request:");
+            Console.WriteLine(requestOwnerOf.GetHttpRequestMessage().RequestUri);
 
         }
 
